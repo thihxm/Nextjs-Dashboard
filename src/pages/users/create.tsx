@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { RiSaveLine } from 'react-icons/ri'
 
 import {
@@ -49,7 +50,11 @@ export default function CreateUser() {
 
           <Flex mt="8" justify="flex-end">
             <HStack spacing="4">
-              <Button colorScheme="whiteAlpha">Cancelar</Button>
+              <Link href="/users" passHref>
+                <Button as="a" colorScheme="whiteAlpha">
+                  Cancelar
+                </Button>
+              </Link>
               <Button
                 colorScheme="pink"
                 leftIcon={<Icon as={RiSaveLine} fontSize="20" />}
