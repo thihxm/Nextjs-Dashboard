@@ -24,13 +24,37 @@ import { Header } from '../../components/Header'
 import Pagination from '../../components/Pagination'
 import { Sidebar } from '../../components/Sidebar'
 
-export default function UserList() {
-  const { data, isLoading, error } = useQuery('users', async () => {
-    const response = await fetch('http://localhost:3000/api/users')
-    const data = response.json()
+type User = {
+  id: number
+  name: string
+  email: string
+  createdAt: string
+}
 
-    return data
-  })
+export default function UserList() {
+  const { data, isLoading, isFetching, error } = useQuery(
+    'users',
+    async () => {
+      const response = await fetch('http://localhost:3000/api/users')
+      const data = (await response.json()) as { users: User[] }
+
+      const users = data.users.map((user) => {
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          createdAt: new Date(user.createdAt).toLocaleDateString('pt-BR', {
+            dateStyle: 'long',
+          }),
+        }
+      })
+
+      return users
+    },
+    {
+      staleTime: 1000 * 5,
+    }
+  )
 
   const isWideVersion = useBreakpointValue({
     base: false,
@@ -48,6 +72,9 @@ export default function UserList() {
           <Flex mb="8" justify="space-between" align="center">
             <Heading size="lg" fontWeight="normal">
               Usuários
+              {!isLoading && isFetching && (
+                <Spinner size="sm" color="gray.500" ml="4" />
+              )}
             </Heading>
 
             <Link href="/users/create" passHref>
@@ -84,48 +111,23 @@ export default function UserList() {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  <Tr>
-                    <Td px={['4', '4', '6']}>
-                      <Checkbox colorScheme="pink" />
-                    </Td>
-                    <Td>
-                      <Box>
-                        <Text fontWeight="bold">Thiago Medeiros</Text>
-                        <Text fontSize="sm" color="gray.300">
-                          thihxm@gmail.com
-                        </Text>
-                      </Box>
-                    </Td>
-                    {isWideVersion && <Td>24 de Janeiro, 2022</Td>}
-                  </Tr>
-                  <Tr>
-                    <Td px={['4', '4', '6']}>
-                      <Checkbox colorScheme="pink" />
-                    </Td>
-                    <Td>
-                      <Box>
-                        <Text fontWeight="bold">Thiago Medeiros</Text>
-                        <Text fontSize="sm" color="gray.300">
-                          thihxm@gmail.com
-                        </Text>
-                      </Box>
-                    </Td>
-                    {isWideVersion && <Td>24 de Janeiro, 2022</Td>}
-                  </Tr>
-                  <Tr>
-                    <Td px={['4', '4', '6']}>
-                      <Checkbox colorScheme="pink" />
-                    </Td>
-                    <Td>
-                      <Box>
-                        <Text fontWeight="bold">Thiago Medeiros</Text>
-                        <Text fontSize="sm" color="gray.300">
-                          thihxm@gmail.com
-                        </Text>
-                      </Box>
-                    </Td>
-                    {isWideVersion && <Td>24 de Janeiro, 2022</Td>}
-                  </Tr>
+                  {data &&
+                    data.map((user) => (
+                      <Tr key={user.id}>
+                        <Td px={['4', '4', '6']}>
+                          <Checkbox colorScheme="pink" />
+                        </Td>
+                        <Td>
+                          <Box>
+                            <Text fontWeight="bold">{user.name}</Text>
+                            <Text fontSize="sm" color="gray.300">
+                              {user.email}
+                            </Text>
+                          </Box>
+                        </Td>
+                        {isWideVersion && <Td>{user.createdAt}</Td>}
+                      </Tr>
+                    ))}
                 </Tbody>
               </Table>
 

@@ -14,7 +14,7 @@ export function makeServer() {
     },
     factories: {
       user: Factory.extend({
-        name(i) {
+        name() {
           return `${faker.name.firstName()} ${faker.name.lastName()}`
         },
         email() {
@@ -26,7 +26,7 @@ export function makeServer() {
       }),
     },
     seeds(server) {
-      server.createList('user', 200)
+      server.createList('user', 10)
     },
     routes() {
       this.namespace = 'api'
