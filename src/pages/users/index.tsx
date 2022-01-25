@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { RiAddLine } from 'react-icons/ri'
-import { useQuery } from 'react-query'
 
 import {
   Box,
@@ -23,42 +22,10 @@ import {
 import { Header } from '../../components/Header'
 import Pagination from '../../components/Pagination'
 import { Sidebar } from '../../components/Sidebar'
-import { api } from '../../services/api'
-
-type User = {
-  id: number
-  name: string
-  email: string
-  createdAt: string
-}
-
-type GetUsersResponse = {
-  users: User[]
-}
+import { useUsers } from '../../services/hooks/useUsers'
 
 export default function UserList() {
-  const { data, isLoading, isFetching, error } = useQuery(
-    'users',
-    async () => {
-      const { data } = await api.get<GetUsersResponse>('/users')
-
-      const users = data.users.map((user) => {
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          createdAt: new Date(user.createdAt).toLocaleDateString('pt-BR', {
-            dateStyle: 'long',
-          }),
-        }
-      })
-
-      return users
-    },
-    {
-      staleTime: 1000 * 5,
-    }
-  )
+  const { data, isLoading, isFetching, error } = useUsers()
 
   const isWideVersion = useBreakpointValue({
     base: false,
