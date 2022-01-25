@@ -23,6 +23,7 @@ import {
 import { Header } from '../../components/Header'
 import Pagination from '../../components/Pagination'
 import { Sidebar } from '../../components/Sidebar'
+import { api } from '../../services/api'
 
 type User = {
   id: number
@@ -31,12 +32,15 @@ type User = {
   createdAt: string
 }
 
+type GetUsersResponse = {
+  users: User[]
+}
+
 export default function UserList() {
   const { data, isLoading, isFetching, error } = useQuery(
     'users',
     async () => {
-      const response = await fetch('http://localhost:3000/api/users')
-      const data = (await response.json()) as { users: User[] }
+      const { data } = await api.get<GetUsersResponse>('/users')
 
       const users = data.users.map((user) => {
         return {
