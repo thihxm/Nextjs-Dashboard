@@ -1,10 +1,10 @@
 import faker from 'faker'
 import {
+  ActiveModelSerializer,
   createServer,
   Factory,
   Model,
   Response,
-  RestSerializer,
 } from 'miragejs'
 
 type User = {
@@ -15,13 +15,11 @@ type User = {
 
 export function makeServer() {
   const server = createServer({
+    serializers: {
+      application: ActiveModelSerializer,
+    },
     models: {
       user: Model.extend<Partial<User>>({}),
-    },
-    serializers: {
-      user: RestSerializer.extend({
-        embed: true,
-      }),
     },
     factories: {
       user: Factory.extend({
@@ -51,7 +49,10 @@ export function makeServer() {
         const pageStart = (Number(page) - 1) * Number(per_page)
         const pageEnd = pageStart + Number(per_page)
 
-        const users = schema.all('user').models.slice(pageStart, pageEnd)
+        const users = schema
+          .all('user')
+          .models.sort((a, b) => b.createdAt - a.createdAt)
+          .slice(pageStart, pageEnd)
 
         return new Response(
           200,
